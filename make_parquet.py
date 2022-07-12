@@ -54,7 +54,7 @@ def make_parquet(target_date):
         daily_dataFrame.to_parquet(path=output_filepath, compression="gzip")
 
 from concurrent import futures
-DATE_RANGE = pd.date_range(start="2022-06-02",end="2022-07-01")
+DATE_RANGE = pd.date_range(start="2021-11-01",end="2021-12-31")
 
 with futures.ThreadPoolExecutor(max_workers=2) as executor :
     _ = [executor.submit(make_parquet,target_date) for target_date in DATE_RANGE]
