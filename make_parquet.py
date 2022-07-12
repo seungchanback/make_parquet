@@ -44,7 +44,7 @@ def make_parquet(target_date):
     obj_list = S3.list_objects(Bucket=bucket_name, Prefix=bucket_prefix)
     
     daily_dataFrame = _make_daily_dataFrame(obj_list,bucket_name)
-    output_dir_path = f"cdata_day_naverpay_etl/{year}/{month}/{day}"
+    output_dir_path = f"s3//storelink-data-etl-dev/cdata_day_naverpay_etl/{year}/{month}/{day}"
 
     if not os.path.exists(output_dir_path):
         os.makedirs(output_dir_path, exist_ok=True)
