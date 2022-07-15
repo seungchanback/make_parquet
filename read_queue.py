@@ -12,13 +12,16 @@ while 1:
         QueueUrl = queue.url,
         MaxNumberOfMessages = 1
     )
+        
+    message_handle = response['Messages'][0]['ReceiptHandle']
+    response = sqs_client.delete_message(QueueUrl=queue.url,
+                                        ReceiptHandle=message_handle)
+    
     try:
         date = response['Messages'][0]['Body']
     except KeyError:
         break
-        
-    message_handle = response['Messages'][0]['ReceiptHandle']
-
+    
     year = date[:4]
     month = date[5:7]
     day = date[8:10]
@@ -26,8 +29,6 @@ while 1:
     from make_parquet import make_parquet
     make_parquet(year,month,day)
 
-    response = sqs_client.delete_message(QueueUrl=queue.url,
-                                        ReceiptHandle=message_handle)
     breakpoint()
 
 from send_discord import send_discord_msg

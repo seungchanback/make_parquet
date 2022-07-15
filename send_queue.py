@@ -20,7 +20,7 @@ except sqs_client.exceptions.QueueDoesNotExist:
     today_queue = sqs_resource.get_queue_by_name(QueueName=queue_name)
 
 date_range = pd.date_range(start="2021-09-18",
-                            end="2021-10-12")
+                            end="2022-07-12")
 
 for date in date_range:
     print(date)
