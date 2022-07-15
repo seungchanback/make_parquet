@@ -29,8 +29,6 @@ while 1:
     from make_parquet import make_parquet
     make_parquet(year,month,day)
 
-    breakpoint()
-
 from send_discord import send_discord_msg
 send_discord_msg("""
         Parquet 변경 끝 !!
