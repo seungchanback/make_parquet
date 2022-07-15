@@ -9,6 +9,8 @@ s3fs = "*"
 pandas = "*"
 tqdm = "*"
 pyarrow = "*"
+discord = "*"
+requests = "*"
 
 [dev-packages]
 pylint = "*"
