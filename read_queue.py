@@ -1,7 +1,7 @@
 import boto3
 
-sqs_client = boto3.client('sqs')
-sqs_resource = boto3.resource('sqs')
+sqs_client = boto3.client('sqs',region_name='ap-northeast-2')
+sqs_resource = boto3.resource('sqs',region_name='ap-northeast-2')
 
 QUEUE_NAME = "dev-cdata2-datatime.fifo"
 queue = sqs_resource.get_queue_by_name(QueueName=QUEUE_NAME)
