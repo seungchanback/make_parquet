@@ -13,9 +13,6 @@ while 1:
         MaxNumberOfMessages = 1
     )
         
-    message_handle = response['Messages'][0]['ReceiptHandle']
-    response = sqs_client.delete_message(QueueUrl=queue.url,
-                                        ReceiptHandle=message_handle)
     
     try:
         date = response['Messages'][0]['Body']
@@ -25,6 +22,10 @@ while 1:
     year = date[:4]
     month = date[5:7]
     day = date[8:10]
+
+    message_handle = response['Messages'][0]['ReceiptHandle']
+    response = sqs_client.delete_message(QueueUrl=queue.url,
+                                        ReceiptHandle=message_handle)
 
     from make_parquet import make_parquet
     make_parquet(year,month,day)
