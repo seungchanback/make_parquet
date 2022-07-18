@@ -19,7 +19,7 @@ SCHEMA_CHECK_BUCKET = 'storelink-data-etl-dev'
 SCHEMA_CHECK_YEAR = "2021"
 SCHEMA_CHECK_MONTH = "09"
 SCHEMA_CHECK_DAY = "18"
-SCHEMA_CHECK_BUCKET_PRIFIX = f"cData_day2_etl/{SCHEMA_CHECK_YEAR}/{SCHEMA_CHECK_MONTH}/{SCHEMA_CHECK_DAY}/{SCHEMA_CHECK_YEAR}-{SCHEMA_CHECK_MONTH}-{SCHEMA_CHECK_DAY}.parquet.gz"
+SCHEMA_CHECK_BUCKET_PRIFIX = f"cdata_day_naverpay_etl/{SCHEMA_CHECK_YEAR}/{SCHEMA_CHECK_MONTH}/{SCHEMA_CHECK_DAY}/{SCHEMA_CHECK_YEAR}-{SCHEMA_CHECK_MONTH}-{SCHEMA_CHECK_DAY}.parquet.gz"
 
 def _make_daily_dataFrame(obj_list, bucket_name):
     def _generate_str_dataframe(dataFrame):
@@ -66,7 +66,7 @@ def make_parquet(year, month, day):
     #month = target_date.strftime("%m")
     #day = target_date.strftime("%d")
 
-    bucket_prefix = RAW_BUCKET_PREFIX.substitute(prefix = 'cData_day2',
+    bucket_prefix = RAW_BUCKET_PREFIX.substitute(prefix = 'cData_day_naver_pay2',
                                                 year = year,
                                                 month = month,
                                                 day = day)
@@ -75,7 +75,7 @@ def make_parquet(year, month, day):
     
     daily_dataFrame = _make_daily_dataFrame(obj_list,bucket_name)
 
-    output_bucket_prefix = OUTPUT_BUCKET_PREFIX.substitute(prefix = 'cData_day2_etl',
+    output_bucket_prefix = OUTPUT_BUCKET_PREFIX.substitute(prefix = 'cdata_day_naverpay_etl',
                                                             year = year,
                                                             month = month,
                                                             day = day)
