@@ -1,4 +1,4 @@
-from make_parquet_2 import make_parquet
+from make_parquet_cData_day_naver_pay2 import make_parquet
 from concurrent import futures
 
 date_list = [
