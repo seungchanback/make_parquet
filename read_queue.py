@@ -60,6 +60,6 @@ def read_queue_and_make_parquet(queue_param_dict):
                     to_bucket_prefix = to_bucket_prefix 
             )
         except:
-            send_queue(f"{year}{month}{day}-fail.fifo",f"{year}{month}{day}")
+            send_queue(f"{to_bucket_name}/{to_bucket_prefix}-fail.fifo",f"{year}{month}{day}")
 
 
