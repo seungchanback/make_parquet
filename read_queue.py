@@ -28,38 +28,36 @@ def read_queue_and_make_parquet(queue_param_dict):
     
     queue = sqs_resource.get_queue_by_name(QueueName=queue_name)
     
-    while 1:
+    response = sqs_client.receive_message(
+        QueueUrl = queue.url,
+        MaxNumberOfMessages = 1
+    )
         
-        response = sqs_client.receive_message(
-            QueueUrl = queue.url,
-            MaxNumberOfMessages = 1
+    
+    try:
+        date = response['Messages'][0]['Body']
+    except KeyError:
+        raise Exception("끝")
+    
+    year = date[:4]
+    month = date[5:7]
+    day = date[8:10]
+
+    message_handle = response['Messages'][0]['ReceiptHandle']
+    response = sqs_client.delete_message(QueueUrl=queue.url,
+                                        ReceiptHandle=message_handle)
+
+    print(f"{date} 변환 시작")
+
+    try:
+        parquet_maker = ParquetMaker(year,month,day)
+        parquet_maker.make_parquet(
+                from_bucket_name = from_bucket_name,
+                from_bucket_prefix = from_bucket_prefix,
+                to_bucket_name = to_bucket_name,
+                to_bucket_prefix = to_bucket_prefix 
         )
-            
-        
-        try:
-            date = response['Messages'][0]['Body']
-        except KeyError:
-            break
-        
-        year = date[:4]
-        month = date[5:7]
-        day = date[8:10]
-
-        message_handle = response['Messages'][0]['ReceiptHandle']
-        response = sqs_client.delete_message(QueueUrl=queue.url,
-                                            ReceiptHandle=message_handle)
-
-        print(f"{date} 변환 시작")
-
-        try:
-            parquet_maker = ParquetMaker(year,month,day)
-            parquet_maker.make_parquet(
-                    from_bucket_name = from_bucket_name,
-                    from_bucket_prefix = from_bucket_prefix,
-                    to_bucket_name = to_bucket_name,
-                    to_bucket_prefix = to_bucket_prefix 
-            )
-        except:
-            send_queue(f"{to_bucket_name}-{to_bucket_prefix}-fail.fifo",f"{year}{month}{day}")
+    except:
+        send_queue(f"{to_bucket_name}-{to_bucket_prefix}-fail.fifo",f"{year}{month}{day}")
 
 

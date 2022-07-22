@@ -1,7 +1,5 @@
 import boto3
 
-
-
 def send_queue(queue_name : str, message : str):
     sqs_client = boto3.client('sqs')
     sqs_resource = boto3.resource('sqs')

@@ -2,6 +2,7 @@
 CSV 를 Parquet 로 만들어주는 모듈
 
 """
+import threading
 from datetime import datetime
 
 import s3fs
@@ -13,14 +14,26 @@ from send_queue import send_queue
 from send_discord import send_discord_msg
 
 
-class ParquetMaker():
+class ParquetMaker(threading.Thread):
     
-    def __init__(self, year, month, day):
+    def __init__(   self,
+                    year,
+                    month,
+                    day,
+                    from_bucket_name,
+                    from_bucket_prefix,
+                    to_bucket_name,
+                    to_bucket_prefix):
+        super().__init__()
         self.s3_client = boto3.client('s3')
         self.year = year
         self.month = month
         self.day = day
 
+        self.from_bucket_name = from_bucket_name
+        self.from_bucket_prefix = from_bucket_prefix
+        self.to_bucket_name = to_bucket_name
+        self.to_bucket_prefix = to_bucket_prefix
     
     def _make_daily_dataframe(self, key_list : list, bucket_name : str) -> pd.DataFrame:
         """입력된 key_list 에 해당하는 csv 를 모아서 하나의 dataframe 으로 반환합니다.
@@ -141,13 +154,13 @@ class ParquetMaker():
         
         return None
 
-    def make_parquet(self,
-                    from_bucket_name : str,
-                    from_bucket_prefix : str,
-                    to_bucket_name : str,
-                    to_bucket_prefix : str):
-    
+    def run(self):
+        from_bucket_name = self.from_bucket_name
+        from_bucket_prefix = self.from_bucket_prefix
+        to_bucket_name = self.to_bucket_name
+        to_bucket_prefix = self.to_bucket_prefix
 
+        print(f"{self.year}-{self.month}-{self.day} Start")
         from_bucket_key_list = self._get_key_list(from_bucket_name,from_bucket_prefix)
         daily_dataframe = self._make_daily_dataframe(from_bucket_key_list, from_bucket_name)
         self._check_schema(daily_dataframe)
