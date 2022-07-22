@@ -21,10 +21,9 @@ def send_queue(queue_name : str, message : str):
                                                     'ContentBasedDeduplication' : 'true'})
         today_queue = sqs_resource.get_queue_by_name(QueueName=queue_name)
     
-    sqs_client.send_message(QueueUrl=today_queue.url,
-                            MessageBody=message,
-                            MessageGroupId=queue_name
-                            )
+    sqs_client.send_message(    QueueUrl=today_queue.url,
+                                MessageBody=message,
+                                MessageGroupId=queue_name   )
     return None
 
 

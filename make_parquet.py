@@ -60,26 +60,48 @@ class ParquetMaker(threading.Thread):
                 str_dataframe[column] = temp_dataframe[column].astype("string")
 
             return str_dataframe
-
-        total_daily_dataframe = None
         
-        for index, key in tqdm(enumerate(key_list), total=len(key_list)):
-            key = f"s3://{bucket_name}/{key}"
+        def _list_chunk(temp_list : list, chunk_element_number : int)-> list:
+            """리스트를 입력받고, chunk_element_number 만큼의 요소를 포함하는 chunk를 담은 리스트를 반환합니다.
 
-            try:
-                temp_csv = pd.read_csv(key)
-            except IndexError:
-                print(f"{key} 에 대한 csv 파일을 만들 수 없습니다.")
-                continue
-                
+            Args:
+                temp_list (list): 입력 리스트
+                chunk_element_number (int): chunk 에 포함될 element 수
 
-            if index == 0 :
-                total_daily_dataframe = _generate_str_dataframe(temp_csv)
-            elif index > 0 :
-                temp_dataFrame = _generate_str_dataframe(temp_csv)
-                total_daily_dataframe = pd.concat([total_daily_dataframe,temp_dataFrame], axis=0)
-                
-        return total_daily_dataframe
+            Returns:
+                list: chunk 로 분환된 리스트
+            """
+            return [temp_list[start_index:start_index+chunk_element_number] for start_index in range(0, len(temp_list), chunk_element_number)]
+
+        key_list = _list_chunk(key_list, 100)
+
+        while len(key_list) != 0 :
+
+            chunk_dataframe = None
+            temp_key_list = key_list.pop()
+
+            for index, key in tqdm(enumerate(temp_key_list), total=len(temp_key_list)):
+                key = f"s3://{bucket_name}/{key}"
+
+                try:
+                    temp_csv = pd.read_csv(key)
+                except IndexError:
+                    print(f"{key} 에 대한 csv 파일을 만들 수 없습니다.")
+                    continue
+                    
+
+                if index == 0 :
+                    chunk_dataframe = _generate_str_dataframe(temp_csv)
+                elif index > 0 :
+                    temp_dataFrame = _generate_str_dataframe(temp_csv)
+                    chunk_dataframe = pd.concat([chunk_dataframe,temp_dataFrame], axis=0)
+            
+            self._check_schema(chunk_dataframe)
+
+            output_path = f"s3://{self.to_bucket_name}/{self.to_bucket_prefix}/{self.year}/{self.month}/{self.day}/{self.year}-{self.month}-{self.day}_{len(key_list)+1}.parquet.gz"
+            chunk_dataframe.to_parquet(path=output_path, compression="gzip")
+            
+        return None
 
     def _get_key_list(self, from_bucket_name : str,from_bucket_prefix : str):
         
@@ -162,10 +184,6 @@ class ParquetMaker(threading.Thread):
 
         print(f"{self.year}-{self.month}-{self.day} Start")
         from_bucket_key_list = self._get_key_list(from_bucket_name,from_bucket_prefix)
-        daily_dataframe = self._make_daily_dataframe(from_bucket_key_list, from_bucket_name)
-        self._check_schema(daily_dataframe)
-
-        output_path = f"s3://{to_bucket_name}/{to_bucket_prefix}/{self.year}/{self.month}/{self.day}/{self.year}-{self.month}-{self.day}.parquet.gz"
-        daily_dataframe.to_parquet(path=output_path, compression="gzip")
+        self._make_daily_dataframe(from_bucket_key_list, from_bucket_name)
         
         send_queue(f"{to_bucket_name}-{to_bucket_prefix}-success.fifo",f"{self.year}{self.month}{self.day}")

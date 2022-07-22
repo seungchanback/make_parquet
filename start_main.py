@@ -51,7 +51,7 @@ while 1:
                         'to_bucket_name' : "storelink-data-etl-dev",
                         'to_bucket_prefix' : "cdata_day2_etl"}
     date_dict_list = []
-    for i in range(1,1+1):
+    for i in range(1,15+1):
         date_dict = read_queue(queue_param_dict)
         date_dict_list.append(date_dict)
 
