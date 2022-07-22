@@ -25,7 +25,7 @@ def read_queue_and_make_parquet(queue_param_dict):
 
     sqs_client = boto3.client('sqs',region_name='ap-northeast-2')
     sqs_resource = boto3.resource('sqs',region_name='ap-northeast-2')
-    print("hello",queue_name)
+    
     queue = sqs_resource.get_queue_by_name(QueueName=queue_name)
     
     while 1:
@@ -60,6 +60,6 @@ def read_queue_and_make_parquet(queue_param_dict):
                     to_bucket_prefix = to_bucket_prefix 
             )
         except:
-            send_queue(f"{to_bucket_name}/{to_bucket_prefix}-fail.fifo",f"{year}{month}{day}")
+            send_queue(f"{to_bucket_name}-{to_bucket_prefix}-fail.fifo",f"{year}{month}{day}")
 
 

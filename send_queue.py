@@ -1,9 +1,10 @@
 import boto3
 
-sqs_client = boto3.client('sqs')
-sqs_resource = boto3.resource('sqs')
+
 
 def send_queue(queue_name : str, message : str):
+    sqs_client = boto3.client('sqs')
+    sqs_resource = boto3.resource('sqs')
     """Queue 이름 확인 후 없으면 생성하고, message 를 큐에 전송합니다.
 
     Args:

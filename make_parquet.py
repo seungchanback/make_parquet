@@ -155,4 +155,4 @@ class ParquetMaker():
         output_path = f"s3://{to_bucket_name}/{to_bucket_prefix}/{self.year}/{self.month}/{self.day}/{self.year}-{self.month}-{self.day}.parquet.gz"
         daily_dataframe.to_parquet(path=output_path, compression="gzip")
         
-        send_queue(f"{to_bucket_name}/{to_bucket_prefix}-success.fifo",f"{self.year}{self.month}{self.day}")
+        send_queue(f"{to_bucket_name}-{to_bucket_prefix}-success.fifo",f"{self.year}{self.month}{self.day}")
