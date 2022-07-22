@@ -26,4 +26,3 @@ def send_queue(queue_name : str, message : str):
                                 MessageGroupId=queue_name   )
     return None
 
-
